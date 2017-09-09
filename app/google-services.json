@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "98194929924-vo18lbueo6s89vn9vnc5v01brdaknf7k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.naveed.simpleblog",
+            "certificate_hash": "6203b84b64d5aadf5c18711932cbc073f75436e1"
+          }
+        },
+        {
           "client_id": "98194929924-spsq02chkcmdef7vnc8mdnnm2c7v2gav.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
