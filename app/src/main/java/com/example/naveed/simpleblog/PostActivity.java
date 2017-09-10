@@ -31,7 +31,7 @@ public class PostActivity extends AppCompatActivity {
     private Button post;
     private Uri image;
     private StorageReference myref;
-    private DatabaseReference dbref;
+    private DatabaseReference dbref,dbuser;
     private ProgressDialog pg;
 
     private FirebaseAuth mAuth;
@@ -48,6 +48,7 @@ public class PostActivity extends AppCompatActivity {
         post = (Button)findViewById(R.id.post);
         myref = FirebaseStorage.getInstance().getReference();
         dbref = FirebaseDatabase.getInstance().getReference().child("Blog");
+        dbuser = FirebaseDatabase.getInstance().getReference().child("Users");
         pg = new ProgressDialog(this);
         post.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,7 +75,7 @@ public class PostActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == GALLERY_REQUEST && resultCode == RESULT_OK)
         {
-             image = data.getData();
+            image = data.getData();
             img.setImageURI(image);
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -92,20 +93,21 @@ public class PostActivity extends AppCompatActivity {
             ref.putFile(image).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                   final Uri i = taskSnapshot.getDownloadUrl();   //get download uri to save into realtime database
+                    final Uri i = taskSnapshot.getDownloadUrl();   //get download uri to save into realtime database
 
 
                     final DatabaseReference db = dbref.push();
 
-
+                    final DatabaseReference dref = dbuser.child(mAuth.getCurrentUser().getUid());
 
                     databaseUser.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
+
                             db.child("title").setValue(ptitle);
                             db.child("desc").setValue(pdesc);
                             db.child("image").setValue(i.toString());
-                            db.child("name").setValue(dataSnapshot.child("name").getValue());
+                            db.child("name").setValue("JON");
                             db.child("uid").setValue(firebaseUser.getUid());
                             pg.dismiss();
                             startActivity(new Intent(PostActivity.this,MainActivity.class));

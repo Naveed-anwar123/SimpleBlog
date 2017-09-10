@@ -16,6 +16,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 /**
  * Created by Naveed Anwar on 09/09/2017.
@@ -24,11 +26,12 @@ import com.google.firebase.auth.FirebaseAuth;
 public class RegisterActivity  extends AppCompatActivity {
 
 
-    private String uemail,upassword;
-    private EditText email,password;
+    private String uemail,upassword,uname;
+    private EditText email,password,name;
 
     private Button register;
     private FirebaseAuth mAuth;
+    private DatabaseReference ref;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private ProgressDialog pg;
     private TextView link;
@@ -39,6 +42,8 @@ public class RegisterActivity  extends AppCompatActivity {
         register = (Button)findViewById(R.id.register);
         email = (EditText)findViewById(R.id.email);
         password = (EditText)findViewById(R.id.password);
+        name = (EditText)findViewById(R.id.name);
+        ref = FirebaseDatabase.getInstance().getReference("Users");
         pg = new ProgressDialog(this);
         pg.setMessage("Creating you account...");
         mAuth = FirebaseAuth.getInstance();
@@ -57,11 +62,10 @@ public class RegisterActivity  extends AppCompatActivity {
             public void onClick(View view) {
                 uemail = email.getText().toString();
                 upassword = password.getText().toString();
-                if(!uemail.equals("") && !upassword.equals(""))
+                uname = name.getText().toString();
+                if(!uemail.equals("") && !upassword.equals("") && !uname.equals(""))
                 {
-
                     startRegister();
-
                 }
             }
         });
@@ -75,7 +79,8 @@ public class RegisterActivity  extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-
+                            DatabaseReference myref = ref.child(mAuth.getCurrentUser().getUid());
+                            myref.child("name").setValue(uname);
                             pg.dismiss();
                             startActivity(new Intent(RegisterActivity.this,LoginActivity.class));
                             finish();
@@ -84,7 +89,6 @@ public class RegisterActivity  extends AppCompatActivity {
                         {
                             pg.dismiss();
                             Toast.makeText(RegisterActivity.this,"Something went wrong",Toast.LENGTH_LONG).show();
-
                         }
                     }
                 });

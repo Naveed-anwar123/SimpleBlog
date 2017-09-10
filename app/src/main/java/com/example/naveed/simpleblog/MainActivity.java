@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
@@ -60,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);      //Recycle view used in activit_main.xml
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
-        mLayoutManager.setReverseLayout(true);     //To show latest post first
+        //mLayoutManager.setReverseLayout(true);     //To show latest post first
         //mLayoutManager.setStackFromEnd(true);﻿
         mRecyclerView.setLayoutManager(mLayoutManager);
 
@@ -84,6 +85,13 @@ public class MainActivity extends AppCompatActivity {
             Intent i = new Intent(MainActivity.this , PostActivity.class);
             startActivity(i);                                                  // Opening post activity
         }
+else if(item.getItemId() == R.id.logout)
+        {
+            mAuth.signOut();
+            Intent i = new Intent(MainActivity.this , LoginActivity.class);
+            startActivity(i);
+            finish();
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -102,9 +110,22 @@ public class MainActivity extends AppCompatActivity {
         ) {
             @Override
             protected void populateViewHolder(BlogHelper viewHolder, Blog model, int position) {
-                    viewHolder.setTitle(model.getTitle());
+                final String post_key = getRef(position).getKey();
+                viewHolder.setTitle(model.getTitle());
                 viewHolder.setDescription(model.getDesc());
                 viewHolder.setImage(getApplicationContext(),model.getImage());
+
+                viewHolder.view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent i = new Intent(MainActivity.this, SinglePostActivity.class);
+                        i.putExtra("key",post_key);
+                        startActivity(i);
+                    }
+                });
+
+
+
             }
 
         };
@@ -121,7 +142,6 @@ public class MainActivity extends AppCompatActivity {
         public void setTitle(String title){
             TextView tview = (TextView) view.findViewById(R.id.stitle);
             tview.setText(title);
-
         }
         public void setDescription(String desc){
             TextView tdesc = (TextView) view.findViewById(R.id.sdecs);
