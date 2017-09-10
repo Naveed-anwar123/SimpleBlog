@@ -1,5 +1,6 @@
 package com.example.naveed.simpleblog;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -31,7 +32,7 @@ public class SinglePostActivity extends AppCompatActivity {
     private TextView title , desc;
 
     FirebaseAuth mAuth;
-    DatabaseReference db;
+    DatabaseReference db,db1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,21 +44,22 @@ public class SinglePostActivity extends AppCompatActivity {
         remove = (Button)findViewById(R.id.remove);
         key = getIntent().getExtras().getString("key");
         db = FirebaseDatabase.getInstance().getReference().child("Blog").child(key);
+        db1 = FirebaseDatabase.getInstance().getReference().child("Blog");
         mAuth = FirebaseAuth.getInstance();
 
 
         db.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
-                title.setText(dataSnapshot.child("title").getValue().toString());
-                desc.setText(dataSnapshot.child("desc").getValue().toString());
-                String url = (String)dataSnapshot.child("image").getValue();
-                String id = (String)dataSnapshot.child("uid").getValue();
-                Picasso.with(SinglePostActivity.this).load(url).into(img);
-                if(mAuth.getCurrentUser().getUid().equals(id))
-                {
-                    remove.setVisibility(View.VISIBLE);
+                if(dataSnapshot.hasChildren()) {
+                    title.setText(dataSnapshot.child("title").getValue().toString());
+                    desc.setText(dataSnapshot.child("desc").getValue().toString());
+                    String url = (String) dataSnapshot.child("image").getValue();
+                    String id = (String) dataSnapshot.child("uid").getValue();
+                    Picasso.with(SinglePostActivity.this).load(url).into(img);
+                    if (mAuth.getCurrentUser().getUid().equals(id)) {
+                        remove.setVisibility(View.VISIBLE);
+                    }
                 }
             }
 
@@ -69,7 +71,9 @@ public class SinglePostActivity extends AppCompatActivity {
         remove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(SinglePostActivity.this,"Press",Toast.LENGTH_LONG).show();
+                db1.child(key).removeValue();
+                startActivity(new Intent(SinglePostActivity.this,MainActivity.class));
+                finish();
             }
         });
 
